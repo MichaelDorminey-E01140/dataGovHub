@@ -30,7 +30,7 @@ for date, users in events.items():
 # UI Formatting Begins
 st.title('Data Governance at Aflac')
 from PIL import Image
-st.image(image= Image.open('favicon-128.png'))
+st.image(image= Image.open("favicon-128.png"))
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs(['About us', "Data Governance Role", "DQ and MDM","Quizzes/Games", "Resources", "Calendar", "Announcements","Discussion Board","Support"])
 with tab1:
     st.header("Our Company")
