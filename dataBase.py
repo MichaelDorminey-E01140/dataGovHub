@@ -1,4 +1,5 @@
 import sqlite3
+import streamlit as st
 
 # Database to save details of added events for the calendar
 def init_db():
@@ -79,3 +80,4 @@ def delete_announcement(id):
     c.execute("DELETE FROM announcements WHERE id = ?", (id,))
     conn.commit()
     conn.close()
+    st.rerun()

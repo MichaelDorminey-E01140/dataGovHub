@@ -36,9 +36,6 @@ def question_fragment():
             st.rerun()  # Trigger rerun to move to next question
 
         feedback_fragment()
-
-        if st.session_state.current_question < len(st.session_state.questions):
-            st.button("Next Question", on_click=lambda: None)  # Placeholder button to move to the next question
     else:
         st.subheader("🎉 Quiz Finished!")
         st.write(f"Your final score is **{st.session_state.score}/{len(st.session_state.questions)}**.")
@@ -67,8 +64,8 @@ def display_quizzes():
         st.session_state.quiz_started = "Data Governance"
         restart_quiz()  # Reset for the Data Governance quiz
         st.session_state.questions = [
-            {"question": "What is Data Governance?", "options": ["Managing data security and compliance", "Creating new databases", "Hacking into secured networks"], "answer": "Managing data security and compliance"},
-            {"question": "Which regulation enforces data privacy in Europe?", "options": ["GDPR", "CCPA", "HIPAA"], "answer": "GDPR"},
+            {"question": "What is Data Governance?", "options": ["Managing data security and compliance", "Creating new databases", "Hacking into secured networks", "Developing Data For Companies"], "answer": "Managing data security and compliance"},
+          
             {"question": "What is the main goal of Data Governance?", "options": ["To secure data storage", "To define policies for data usage", "To encrypt all files"], "answer": "To define policies for data usage"},
             {"question": "Which role is responsible for enforcing data governance policies?", "options": ["CIO", "Data Steward", "Software Engineer", "CEO"], "answer": "Data Steward"},
         ]
