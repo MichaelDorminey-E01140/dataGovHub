@@ -1,4 +1,5 @@
 import streamlit as st
+# Function for interactive forum with 2 columns
 def dropdownAnswers():
     col1,col2 = st.columns(2)
     with col1:
@@ -49,7 +50,7 @@ def dropdownAnswers():
             "How is my team’s data imported into Collibra?",
             "What are the methods of ingestion?",
             "Who's managing my team’s data?",
-            "How secure is Collibra?"
+            "How secure is Collibra?",
             "What are my options for user group permissions? (Roles & Responsibilities)",
             "What is the difference between Asset level permissions and Domain level permissions?",
             "Why is Lineage important to my data?",
@@ -77,11 +78,11 @@ def dropdownAnswers():
             
             if choice == "How secure is Collibra?":
                 st.write("Collibra is accessed through Single Sign On (SSO) which is very secure and standard for accessing Aflac applications."
-                "SSO allows us to effectively limit access if an employee is no longer ith the company, but the Data Governance team also manages the list of active employees to ensure we manually remove a user from Collibra as needed")
+                         "SSO allows us to effectively limit access if an employee is no longer ith the company, but the Data Governance team also manages the list of active employees to ensure we manually remove a user from Collibra as needed")
             
             if choice == "What are my options for user group permissions? (Roles & Responsibilities)":
                 st.write("Everyone has access to view in Collibra, others are placed in a corresponding user group according to their roles – for instance, Claims Data Steward – those identified as a Data Steward in Claims would be part of this user group."
-                         "Any user who will participate in a Workflow for approving or managing assets are placed in a user group. We have a limited number of licenses in Collibra, so those are assigned as needed for individuals who will be participating in a workflow task or responsible for creating connections to their data.")
+                         " Any user who will participate in a Workflow for approving or managing assets are placed in a user group. We have a limited number of licenses in Collibra, so those are assigned as needed for individuals who will be participating in a workflow task or responsible for creating connections to their data.")
             
             if choice == "What is the difference between Asset level permissions and Domain level permissions?":
                 st.write(" Permission is the right to see a resource of any child of that resource including assets as inherited permissions. If the user has domain level permissions, then they can see the assets in that domain. The permission can be assigned on domain or community level to users and groups."

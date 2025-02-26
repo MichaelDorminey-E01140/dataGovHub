@@ -1,4 +1,6 @@
 import streamlit as st
+
+# Data Governance Role Tab Column 1
 def whatDataGov():
     st.write("")
     st.write("Data governance is the systematic management of an organization's data assets to ensure data quality, security, privacy, compliance, and usability while aligning with business objectives.")
@@ -25,7 +27,9 @@ def whatDataGov():
         - Track data lineage to trace the source of data
         - Implement metadata management tools for better data organization
     """)
-def DataGovRR():
+
+# Data Governance Role Tab Column 2
+def dataGovRR():
    st.write("""             
 - **Data Governance Committee**:
   - Plans, implements, and manages the data governance program.
@@ -52,8 +56,11 @@ def DataGovRR():
   - **IT Personnel**: Handle general security, storage, and data retention.
   - **Database Administrators**: Implement database-specific security measures such as encryption and masking policies.
   - **Business Knowledge Workers**: Interact with data regularly, ensuring its secure handling and providing feedback on data governance policies.""")
-def DataGovDQ():
+   
+# DQ and MDM Tab Column 1
+def dataGovDQ():
     st.write("""
+    Components of Data Quality
 - **Data Profiling**: 
   - Analyzes data to identify characteristics, patterns, and anomalies (e.g., duplication, inconsistencies).
   - Helps understand data and ensures alignment with expectations for improvement.
@@ -90,9 +97,11 @@ def DataGovDQ():
 
 - **Global Loss**: 
   - Poor data quality costs businesses an average of $15 million per year, impacting morale and opportunities.""")
-def DataGovMDM():
+    
+#DQ and MDM Tab Column 2
+def dataGovMDM():
     st.write("""
-
+    Master Data Management is a comprehensive method of enabling an enterprise to link all of its critical data to one file, called a master file.
 - **Best Practices**:
   - **Data Integration**: Combines data from different sources to ensure consistency.
   - **Data Stewardship**: Assigns responsibility for maintaining data quality and compliance.
@@ -100,7 +109,7 @@ def DataGovMDM():
   - **Data Governance**: Sets policies and rules for data management and access control.
   - **Master Data Modeling**: Standardizes key business data to align processes and systems.
   - **Data Security and Compliance**: Protects sensitive data and ensures regulatory compliance.
-
+         
 - **Impact of Poor MDM**:
   - **Operational Inefficiency**: Causes delays and redundant work.
   - **Increased Costs**: Leads to higher operational costs and resources spent fixing errors.
