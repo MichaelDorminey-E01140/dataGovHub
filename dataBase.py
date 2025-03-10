@@ -16,7 +16,7 @@ def initDB():
 
 # Add event data to database
 def eventAddDb(date, user, role, event):
-    eventSaveDb(str(date), user or "Anonymous", role or "General User", event)
+    eventSaveDb(str(date), user or " ", role or "User", event)
 
 
 # Load event data from database
@@ -37,7 +37,7 @@ def eventLoadDb():
     conn.close()
     return events
 
-# Save data to database
+# Save event data to database
 def eventSaveDb(date, user, role, event):
     conn = sqlite3.connect("events.db")
     c = conn.cursor()
@@ -45,13 +45,15 @@ def eventSaveDb(date, user, role, event):
     conn.commit()
     conn.close()
 
-#Delete data from database
+#Delete event data from database
 def eventDeleteDb(date, user, role, event):
     conn = sqlite3.connect("events.db")
     c = conn.cursor()
     c.execute("DELETE FROM events WHERE date = ? AND user = ? AND role = ? AND event = ?", (date, user, role, event))
     conn.commit()
     conn.close()
+
+
 
 # Database to add and remove announcements
 def initAnnouncementDb():
@@ -91,25 +93,36 @@ def announcementDeleteDb(id):
     conn.close()
     st.rerun()
 
+
+#Initialize Discussion Database
 def initDiscussionDB():
     conn = sqlite3.connect("discussion.db")
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS posts (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    user TEXT DEFAULT 'Anonymous',
-                    role TEXT DEFAULT 'General User',
+                    user TEXT DEFAULT '',
+                    role TEXT DEFAULT 'User',
                     content TEXT NOT NULL,
-                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-                )
-                ''')
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    likes INTEGER DEFAULT 0,
+                    dislikes INTEGER DEFAULT 0
+                )''')
+
+#Second database used for undo function by tracking last action performed
+    c.execute(''' CREATE TABLE IF NOT EXISTS lastAction(
+                    postID INTEGER PRIMARY KEY,
+                    action TEXT CHECK(action IN ('likes', 'dislikes')),
+                    FOREIGN KEY (postId) REFERENCES posts(id) ON DELETE CASCADE
+                    )''')
     conn.commit()
     conn.close()
 
+# Add Posts to Discussion
 def addPost(user, role, content):
     conn = sqlite3.connect("discussion.db")
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO posts (user, role, content) VALUES (?, ?, ?)", 
-                   (user or "Anonymous", role or "General User", content))
+    cursor.execute("INSERT INTO posts (user, role, content, likes, dislikes) VALUES (?, ?, ?, ?, ?)", 
+                   (user or "", role or "User", content, 0, 0))
     conn.commit()
     conn.close()
 
@@ -117,7 +130,7 @@ def addPost(user, role, content):
 def getPosts(searchQuery=""):
     conn = sqlite3.connect("discussion.db")
     if searchQuery:
-        query = "SELECT * FROM posts WHERE content LIKE ? ORDER BY timestamp DESC"
+        query = "SELECT id, user, role, content, timestamp, likes, dislikes FROM posts WHERE content LIKE ? ORDER BY timestamp DESC"
         df = pd.read_sql_query(query, conn, params=('%' + searchQuery + '%',))
     else:
         df = pd.read_sql_query("SELECT * FROM posts ORDER BY timestamp DESC", conn)
@@ -131,3 +144,75 @@ def deletePost(postID):
     cursor.execute("DELETE FROM posts WHERE id = ?", (postID,))
     conn.commit()
     conn.close()
+
+# Update Like/Dislike Count
+def updateReaction(postID, like=False, dislike=False, undo=False):
+    conn = sqlite3.connect("discussion.db")
+    cursor = conn.cursor()
+    if undo:
+        cursor.execute("SELECT action FROM lastAction WHERE postID = ?",(postID,))
+        lastAction = cursor.fetchone()
+        if lastAction:
+            lastAction = lastAction[0]
+            if lastAction == "like":
+                cursor.execute("UPDATE posts SET likes = likes - 1 WHERE id = ? AND likes > 0",(postID,))
+            elif lastAction == "dislike":
+                cursor.execute("UPDATE posts SET dislikes = dislikes - 1 WHERE id = ? AND dislikes > 0",(postID,)) 
+            cursor.execute("DELETE FROM lastAction WHERE postID = ?",(postID,)) 
+    else:
+        cursor.execute("SELECT action FROM lastAction WHERE postID = ?", (postID,))
+        existingAction = cursor.fetchone()
+        if not existingAction:
+            if like:
+                cursor.execute("UPDATE posts SET likes = likes + 1 WHERE id = ?", (postID,))
+                cursor.execute("INSERT INTO lastAction(postID, action) VALUES(?, ?)", (postID, "like"))
+            if dislike:
+                cursor.execute("UPDATE posts SET dislikes = dislikes + 1 WHERE id = ?", (postID,))
+                cursor.execute("INSERT INTO lastAction(postID, action) VALUES(?, ?)", (postID, "dislike"))
+
+    conn.commit()
+    conn.close()
+
+
+#Initialize Database for Data Cleaning Game
+def initGameDB(): 
+    conn = sqlite3.connect("game.db")
+    c = conn.cursor()
+    c.execute('''Create TABLE IF NOT EXISTS players (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    playerName TEXT UNIQUE NOT NULL,
+                    score INTEGER DEFAULT 0,
+                    timeTaken REAL)
+                   ''')
+    conn.commit()
+    conn.close()
+    
+# Add a player to database
+def addPlayer(playerName):
+    conn = sqlite3.connect("game.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT OR IGNORE INTO players (playerName, score, timeTaken) VALUES (?, ?, ?)", (playerName,0,0))
+    conn.commit()
+    conn.close()
+
+      
+def updatePlayerData(playerName, score, timeTaken):
+    conn = sqlite3.connect("game.db")
+    cursor = conn.cursor()
+    cursor.execute("UPDATE players SET score = ?, timeTaken = ? where playerName = ?", (score, timeTaken, playerName))
+    conn.commit()
+def playerLeaderboard(playerName, score, timeTaken):
+    conn = sqlite3.connect("game.db")
+    cursor = conn.cursor()
+    playerLeaderboard = cursor.execute('''
+        SELECT playerName, score, timeTaken
+        FROM players
+        ORDER BY score DESC, timeTaken ASC
+        LIMIT 5
+        ''').fetchall()
+
+
+
+
+
+

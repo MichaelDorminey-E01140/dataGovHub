@@ -33,11 +33,11 @@ def controlEvent():
 
 # Function to add a new event to the system
 def addEvent():
-    userE = st.text_input("Your Name (Optional)", max_chars=50, placeholder="Leave blank for Anonymous")
-    area = st.text_input("Your Role (Optional)", max_chars=50, placeholder="Leave blank for General User")
+    userE = st.text_input("Your Name (Optional)", max_chars=50, placeholder="Enter")
+    area = st.text_input("Your Role (Optional)", max_chars=50, placeholder="Enter")
     selected_date = st.date_input("Select a Date", value=datetime.datetime.today())
     event_text = st.text_input("Add Event", placeholder = "Enter Event",)
-    if st.button("Save Event") and userE:
+    if st.button("Add Event"):
         eventAddDb(str(selected_date), userE, area, event_text)
         st.rerun()
         st.success(f"Event added for {selected_date} by {userE, area}")
