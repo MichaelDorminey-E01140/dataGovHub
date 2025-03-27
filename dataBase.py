@@ -84,7 +84,7 @@ def announcementLoadDb():
     conn.close()
     return rows
 
-#Delete announcements from database
+# Delete announcements from database
 def announcementDeleteDb(id):
     conn = sqlite3.connect("announcements.db")
     c = conn.cursor()
@@ -94,7 +94,7 @@ def announcementDeleteDb(id):
     st.rerun()
 
 
-#Initialize Discussion Database
+# Initialize Discussion Database
 def initDiscussionDB():
     conn = sqlite3.connect("discussion.db")
     c = conn.cursor()
@@ -174,44 +174,65 @@ def updateReaction(postID, like=False, dislike=False, undo=False):
     conn.close()
 
 
-#Initialize Database for Data Cleaning Game
+# Initialize Database for Data Cleaning Game
 def initGameDB(): 
     conn = sqlite3.connect("game.db")
     c = conn.cursor()
     c.execute('''Create TABLE IF NOT EXISTS players (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    playerName TEXT UNIQUE NOT NULL,
+                    name TEXT NOT NULL,
                     score INTEGER DEFAULT 0,
                     timeTaken REAL)
                    ''')
     conn.commit()
     conn.close()
-    
-# Add a player to database
-def addPlayer(playerName):
+# Updating player data based on game performance
+def updateGamePlayerData(name, score, timeTaken):
     conn = sqlite3.connect("game.db")
     cursor = conn.cursor()
-    cursor.execute("INSERT OR IGNORE INTO players (playerName, score, timeTaken) VALUES (?, ?, ?)", (playerName,0,0))
+    cursor.execute("INSERT INTO players (name, score, timeTaken) VALUES (?,?,?)", (name,score,timeTaken))
     conn.commit()
     conn.close()
-
-      
-def updatePlayerData(playerName, score, timeTaken):
+# Pulling player data     
+def getGameLeaderboard():
     conn = sqlite3.connect("game.db")
     cursor = conn.cursor()
-    cursor.execute("UPDATE players SET score = ?, timeTaken = ? where playerName = ?", (score, timeTaken, playerName))
+    cursor.execute ('''SELECT name, score, timeTaken 
+                        FROM players 
+                        ORDER BY score DESC, timeTaken ASC 
+                        LIMIT 10''')
+    gameLeaderboard = cursor.fetchall()
+    conn.close()
+    return gameLeaderboard
+
+# Initialize Database for Quizzes
+def initQuizDB(): 
+    conn = sqlite3.connect("quiz.db")
+    c = conn.cursor()
+    c.execute('''Create TABLE IF NOT EXISTS quizTakers (
+                    playerName TEXT NOT NULL,
+                    score INTEGER DEFAULT 0,
+                    timeTaken REAL)
+                   ''')
     conn.commit()
-def playerLeaderboard(playerName, score, timeTaken):
-    conn = sqlite3.connect("game.db")
+    conn.close()    
+# Update player data based on game performance
+def updateQuizPlayerData(playerName, score, timeTaken):
+    conn = sqlite3.connect("quiz.db")
     cursor = conn.cursor()
-    playerLeaderboard = cursor.execute('''
-        SELECT playerName, score, timeTaken
-        FROM players
-        ORDER BY score DESC, timeTaken ASC
-        LIMIT 5
-        ''').fetchall()
-
-
+    cursor.execute("INSERT INTO quizTakers (playerName, score, timeTaken) VALUES (?,?,?)", (playerName,score,timeTaken))
+    conn.commit() 
+    conn.close()
+# Pulling quiz data 
+def getQuizLeaderboard():
+    conn = sqlite3.connect("quiz.db")
+    cursor = conn.cursor()
+    cursor.execute ('''SELECT playerName, score, timeTaken 
+                        FROM quizTakers 
+                        ORDER BY score DESC, timeTaken ASC 
+                        LIMIT 10''')
+    quizLeaderboard = cursor.fetchall()
+    conn.close()
+    return quizLeaderboard
 
 
 

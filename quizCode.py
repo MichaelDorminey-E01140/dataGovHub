@@ -1,5 +1,7 @@
 import streamlit as st
-
+import pandas as pd
+from dataBase import *
+import time
 # Function to reset quiz
 def restartQuiz():
     st.session_state.current_question = 0
@@ -17,6 +19,10 @@ def scoreFragment():
 
 # Function to display the question
 def questionFragment():
+    playerName = st.text_input("Enter your Name and the quiz your taking to track score for leaderboard then press Enter:", "")
+    if playerName and "start_time" not in st.session_state:
+        st.write(f"Welcome, {playerName}! You will be taking a quiz now.")
+        st.session_state.start_time = time.time()
     q_index = st.session_state.current_question
     if q_index < len(st.session_state.questions):
         questionData = st.session_state.questions[q_index]
@@ -28,14 +34,28 @@ def questionFragment():
                 st.session_state.score += 1
                 st.session_state.feedback = " Correct!"
             else:
-                st.session_state.feedback = f" Incorrect! The correct answer is {questionData['answer']}."
+                st.session_state.feedback = " Incorrect!."
             st.session_state.current_question += 1
             st.rerun()  # Trigger rerun to move to next question
 
         feedbackFragment()
     else:
         st.subheader(" Quiz Finished!")
+        endTime = time.time()
+        timeTakeSeconds = endTime - st.session_state.start_time
+        timeTakeSeconds = round(timeTakeSeconds)
         st.write(f"Your final score is **{st.session_state.score}/{len(st.session_state.questions)}**.")
+        st.write(f"Your final time is {timeTakeSeconds}")
+        if st.checkbox("Submit Score to Leaderboard"):
+                updateQuizPlayerData(playerName, st.session_state.score, timeTakeSeconds)
+                st.success("Your results have been successfully submitted to the leaderboard")
+            # Display leaderboard
+        st.write("📊 **Leaderboard**")
+        quizLeaderboard = getQuizLeaderboard()
+        if quizLeaderboard:
+            df = pd.DataFrame(quizLeaderboard, columns =  ["Player Name", "Score", "Time Taken "])
+            st.table(df)
+        
 
 # Main logic for selecting quizzes
 def displayQuizzes():

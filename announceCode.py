@@ -20,7 +20,7 @@ def listAnnounce():
         ann_id, announcement, userA, positionA = ann
         st.write(f"{announcement}- by {userA} ({positionA})")
         st.text("------")
-        if st.button(f"Delete { announcement}"):
+        if st.button(f" Delete { announcement}"):
             announcementDeleteDb(ann_id)
             st.warning("Message deleted!")
 
