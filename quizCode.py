@@ -19,7 +19,7 @@ def scoreFragment():
 
 # Function to display the question
 def questionFragment():
-    playerName = st.text_input("Enter your Name and the quiz your taking to track score for leaderboard then press Enter:", "")
+    playerName = st.text_input("Enter your Name and the quiz your taking to track score for leaderboard then press Enter: (Reload Page before starting quiz again)", "")
     if playerName and "start_time" not in st.session_state:
         st.write(f"Welcome, {playerName}! You will be taking a quiz now.")
         st.session_state.start_time = time.time()
@@ -55,6 +55,9 @@ def questionFragment():
         if quizLeaderboard:
             df = pd.DataFrame(quizLeaderboard, columns =  ["Player Name", "Score", "Time Taken "])
             st.table(df)
+    if st.button("Clear Quiz Database"):
+                clearQuizDB()
+                st.rerun()
         
 
 # Main logic for selecting quizzes

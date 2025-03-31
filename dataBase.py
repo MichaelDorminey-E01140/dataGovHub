@@ -178,27 +178,26 @@ def updateReaction(postID, like=False, dislike=False, undo=False):
 def initGameDB(): 
     conn = sqlite3.connect("game.db")
     c = conn.cursor()
-    c.execute('''Create TABLE IF NOT EXISTS players (
+    c.execute('''Create TABLE IF NOT EXISTS players(
                     name TEXT NOT NULL,
-                    score INTEGER DEFAULT 0,
-                    timeTaken REAL)
+                    score INTEGER DEFAULT 0)
                    ''')
     conn.commit()
     conn.close()
 # Updating player data based on game performance
-def updateGamePlayerData(name, score, timeTaken):
+def updateGamePlayerData(name, score):
     conn = sqlite3.connect("game.db")
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO players (name, score, timeTaken) VALUES (?,?,?)", (name,score,timeTaken))
+    cursor.execute("INSERT INTO players (name, score) VALUES (?,?,?)", (name,score))
     conn.commit()
     conn.close()
 # Pulling player data     
 def getGameLeaderboard():
     conn = sqlite3.connect("game.db")
     cursor = conn.cursor()
-    cursor.execute ('''SELECT name, score, timeTaken 
+    cursor.execute ('''SELECT name, score 
                         FROM players 
-                        ORDER BY score DESC, timeTaken ASC 
+                        ORDER BY score DESC
                         LIMIT 10''')
     gameLeaderboard = cursor.fetchall()
     conn.close()
@@ -233,6 +232,23 @@ def getQuizLeaderboard():
     quizLeaderboard = cursor.fetchall()
     conn.close()
     return quizLeaderboard
+
+def clearGameDB():
+    conn = sqlite3.connect("game.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM players;")
+    conn.commit()
+    conn.close()
+    st.write("Database cleared")
+
+def clearQuizDB():
+    conn = sqlite3.connect("quiz.db")
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM quizTakers;")
+    conn.commit()
+    conn.close()
+    st.write("Database cleared")
+
 
 
 

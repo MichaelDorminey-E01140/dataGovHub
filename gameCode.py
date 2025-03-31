@@ -10,11 +10,11 @@ def startingGame():
     # Game button to start
     if st.button("Start Data Cleaning Game"):
         st.session_state.game_started = True
-        st.session_state.start_time = time.time()
 
     # Start game logic
     if st.session_state.get("game_started", False):
         playerName = st.text_input("Enter your Name or Nickname:", "")
+
         if playerName:
             st.write(f"Welcome, {playerName}! You will be cleaning cafe sales data.")
 
@@ -23,8 +23,8 @@ def startingGame():
             fullDF = pd.read_csv(filePath)
             subsetSize = 50
             df = fullDF.sample(n=subsetSize, random_state=random.randint(1, 1000)).sort_index()
-            score = 100
-
+            if "score" not in st.session_state:
+                st.session_state.score = 100
             # Store data in session to prevent resets
             if "df" not in st.session_state:
                 st.session_state.df = df.copy()
@@ -38,7 +38,9 @@ def startingGame():
             actual_columns = df.columns.tolist()
             expected_columns = ["Item", "Quantity", "Price Per Unit", "Total Spent", "Payment Method", "Location", "Transaction Date"]
             error_columns = [col for col in expected_columns if col in actual_columns]
-
+            def wrong_click():
+                if st.session_state.score > 0:
+                    st.session_state.score -=1
             def isInvalid(value, column):
                 if pd.isnull(value):  
                     return False
@@ -74,9 +76,7 @@ def startingGame():
                     st.rerun()
                 else: 
                     st.write("Not a valid row with a missing value")
-                    score -= 1 
-                return score
-
+                    wrong_click()
 
 
             # Remove duplicates one by one 
@@ -93,9 +93,7 @@ def startingGame():
                         st.rerun() 
                     else:
                         st.write("Not a valid row with an duplicate please choose the second time the row repeats based on Transaction ID")
-                        score -= 1 
-                    return score
-
+                        wrong_click()
             # Remove error rows 
             if len(st.session_state.error_indices) > 0:
                 error_index = sorted(df.index.tolist())
@@ -108,27 +106,24 @@ def startingGame():
                         st.rerun()
                     else:
                         st.write("Not a valid row with an error") 
-                        score -= 1 
-                return score
-
+                        wrong_click()
             # End Game
             if st.session_state.missing_values == 0 and st.session_state.duplicate_rows == 0 and len(st.session_state.error_indices) == 0:
-                end_time = time.time()
-                timeTaken = round(end_time - st.session_state.start_time, 2)
-                timeTakenMinutes = round(timeTaken/60 , 2)
-                score = score - (st.session_state.missing_values + st.session_state.duplicate_rows + len(st.session_state.error_indices))
-                score = max(score, 0)
+                st.session_state.score =  st.session_state.score - (st.session_state.missing_values + st.session_state.duplicate_rows + len(st.session_state.error_indices))
+                st.session_state.score = max(st.session_state.score, 0)
 
                 st.write("🎉 **Game Completed!**")
-                st.write(f"🏆 **Your Score: {score}**")
-                st.write(f"⏳ **Time Taken: {timeTakenMinutes} minutes**")
-                if st.checkbox("Submit Score to Leaderboard"):
-                    updateGamePlayerData(playerName, score, timeTakenMinutes)
-                    st.success("Your results have been successfully submitted to the leaderboard")
+                st.write(f"🏆 **Your Score: { st.session_state.score}**")
+                if st.checkbox("Submit Score to Game Leaderboard"):
+                    updateGamePlayerData(playerName,  int(st.session_state.score))
+                    st.success("Your game results have been successfully submitted to the leaderboard")
                 
                     st.write("📊 **Leaderboard**")
                     gameLeaderboard = getGameLeaderboard()
                     if gameLeaderboard:
-                        df = pd.DataFrame(gameLeaderboard, columns =  ["Player Name", "Score", "Time Taken (Minutes)"])
+                        df = pd.DataFrame(gameLeaderboard, columns =  ["Player Name", "Score"])
                         st.table(df)
+            if st.button("Clear Game Database"):
+                clearGameDB()
+                st.rerun()
                
